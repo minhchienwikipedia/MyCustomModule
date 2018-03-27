@@ -31,6 +31,16 @@ export default class App extends Component<Props> {
     data: '',
     val: ''
   };
+  componentDidMount() {
+    // Register event
+    this.addListener = myCustomModuleEmitter.addListener('addEvent', event =>
+      this.setState({ data: JSON.stringify(event) })
+    );
+  }
+
+  componentWillUnmount() {
+    this.addListener.remove();
+  }
   render() {
     const { data, val } = this.state;
     return (
@@ -44,35 +54,65 @@ export default class App extends Component<Props> {
             borderBottomColor: 'gray',
             borderBottomWidth: 1
           }}
+          placeholder="Type..."
           value={val}
+          underlineColorAndroid="transparent"
           onChangeText={val =>
             this.setState({
               val
             })
           }
         />
-        <Button
-          title="Say Hello"
+        <Text
+          style={styles.text}
           onPress={() =>
             MyCustomModule.hello(val, data => this.setState({ data }))
           }
-        />
-        <Button
-          title="Check is string"
+        >
+          Say Hi
+        </Text>
+        <Text
+          style={styles.text}
           onPress={() =>
             MyCustomModule.isString(val)
-              .then(data =>
-                this.setState({ data: data }, () =>
-                  console.log('2) promise resolved')
-                )
-              )
-              .catch(data =>
-                this.setState({ data: data.message }, () =>
-                  console.log('2) promise rejected')
-                )
-              )
+              .then(data => this.setState({ data: data }))
+              .catch(data => this.setState({ data: data.message }))
           }
-        />
+        >
+          Check is string
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() =>
+            MyCustomModule.getInfo(
+              'Iphone',
+              4,
+              300.012,
+              true,
+              [1, 'two', 'three'],
+              {
+                id: 321321,
+                name: 'Minh Chien',
+                age: 23
+              },
+              data => this.setState({ data: JSON.stringify(data) })
+            )
+          }
+        >
+          Get Info
+        </Text>
+        <Text
+          style={styles.text}
+          onPress={() =>
+            MyCustomModule.addEvent('addEvent', {
+              value: val.toString(),
+              time: new Date().toISOString()
+            })
+          }
+        >
+          Add Event
+        </Text>
+
         <Text>{data}</Text>
       </View>
     );
@@ -95,5 +135,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5
-  }
+  },
+  text: { marginTop: 20, color: '#47A4E0', fontSize: 20 }
 });
